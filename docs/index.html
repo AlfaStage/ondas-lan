@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Ondas LAN — Hub & Mixer de Áudio via Wi-Fi (PC para iPhone/Android)</title>
+  <meta name="description" content="Receba e misture o áudio do seu PC Windows e de vários aparelhos direto no fone Bluetooth conectado ao seu iPhone ou Android via rede local." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Ondas LAN" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <!-- Elemento de áudio nativo para manter o stream vivo em 2º plano e com tela bloqueada no iOS Safari -->
+  <audio id="ios-master-audio" playsinline autoplay style="display:none;"></audio>
+
+  <header class="console-header">
+    <div class="header-inner">
+      <div class="brand-cluster">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 10v3"/>
+            <path d="M6 6v11"/>
+            <path d="M10 3v18"/>
+            <path d="M14 8v7"/>
+            <path d="M18 5v13"/>
+            <path d="M22 10v3"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">ONDAS LAN // AUDIO HUB</h1>
+          <p class="brand-subtitle" id="device-identity-subtitle">Detectando dispositivo na rede local...</p>
+        </div>
+      </div>
+
+      <!-- Seletor de papel deste aparelho -->
+      <nav class="mode-switcher" aria-label="Modo de operação deste aparelho">
+        <button type="button" class="mode-btn active" id="mode-btn-both" data-mode="both">
+          <span class="mode-dot"></span>
+          Estúdio Completo
+        </button>
+        <button type="button" class="mode-btn" id="mode-btn-receiver" data-mode="receiver">
+          <span class="mode-dot"></span>
+          🎧 Ouvir (iPhone / Fone)
+        </button>
+        <button type="button" class="mode-btn" id="mode-btn-sender" data-mode="sender">
+          <span class="mode-dot"></span>
+          📡 Transmitir (PC)
+        </button>
+      </nav>
+
+      <!-- Telemetria de Rede + Botão de Download para PC -->
+      <div class="telemetry-cluster">
+        <a
+          href="./ondas-lan-windows.zip"
+          download="Ondas-LAN-Windows.zip"
+          class="btn btn-sm btn-amber"
+          id="btn-download-zip"
+          style="text-decoration:none;"
+          title="Baixar pacote completo para rodar localmente no seu PC Windows"
+        >
+          ⬇️ Baixar p/ PC (.ZIP)
+        </a>
+        <div class="telemetry-badge" id="ws-status-badge">
+          <span class="led-indicator" id="ws-status-led"></span>
+          <span id="ws-status-text">Conectando...</span>
+        </div>
+        <div class="telemetry-badge" id="latency-badge" title="Latência estimada na rede local">
+          <span>PING:</span>
+          <strong id="ping-readout">-- ms</strong>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="console-main">
+    <!-- Banner de ativação de áudio e modo segundo plano para iPhone / Android -->
+    <section class="ios-unlock-banner" id="audio-unlock-banner" aria-label="Status do motor de áudio">
+      <div class="banner-info">
+        <div class="banner-icon" id="unlock-banner-icon">🎧</div>
+        <div>
+          <h2 class="banner-title" id="unlock-banner-title">Motor de Áudio Pronto para o seu Fone Bluetooth</h2>
+          <p class="banner-desc" id="unlock-banner-desc">
+            No iPhone (iOS) ou Android, toque em <strong>Ativar Escuta &amp; 2º Plano</strong> para liberar o som nos seus fones mesmo com a tela bloqueada ou usando outros apps.
+          </p>
+        </div>
+      </div>
+      <div class="banner-actions">
+        <a
+          href="./ondas-lan-windows.zip"
+          download="Ondas-LAN-Windows.zip"
+          class="btn btn-amber"
+          style="text-decoration:none;"
+        >
+          ⬇️ Baixar Sistema p/ Meu PC (.ZIP)
+        </a>
+        <button type="button" class="btn btn-emerald" id="btn-activate-audio">
+          ▶ Ativar Escuta &amp; 2º Plano (iOS/Android)
+        </button>
+        <button type="button" class="btn" id="btn-simulate-devices" title="Simula múltiplos aparelhos enviando áudio para testar o mixer imediatamente">
+          ⚡ Simular 3 Aparelhos
+        </button>
+      </div>
+    </section>
+
+    <div class="studio-grid">
+      <div class="studio-left-column">
+        <!-- ================================================================
+             MÓDULO 1: MESA RECEPTORA MULTI-APARELHOS (ONDE O IPHONE OUVE TUDO)
+             ================================================================ -->
+        <section class="rack-module" id="receiver-rack-section">
+          <div class="module-header">
+            <div class="module-title-group">
+              <span class="module-tag rx">RX // MIXER</span>
+              <h2 class="module-title">Mesa Receptora — Áudio Unificado no Fone</h2>
+            </div>
+            <div class="telemetry-cluster">
+              <label class="telemetry-badge" style="cursor:pointer;">
+                <input type="checkbox" id="chk-auto-ducking" checked style="accent-color: var(--signal-emerald);" />
+                <span>Auto-Ducking (Prioridade)</span>
+              </label>
+              <label class="telemetry-badge" style="cursor:pointer;">
+                <span>Buffer:</span>
+                <select id="select-jitter-buffer" class="studio-select" style="padding: 2px 6px; font-size: 0.72rem;">
+                  <option value="0.025">Ultra-Rápido (25ms)</option>
+                  <option value="0.045" selected>Estável Wi-Fi (45ms)</option>
+                  <option value="0.090">Suave (90ms)</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="module-body">
+            <!-- Master Bus (Saída final para o Fone Bluetooth do iPhone) -->
+            <div class="master-bus-strip">
+              <div class="master-meter-box">
+                <div class="meter-label-row">
+                  <span>SAÍDA MASTER (FONE BLUETOOTH)</span>
+                  <span id="master-db-readout">-∞ dB</span>
+                </div>
+                <canvas id="master-spectrum-canvas" class="spectrum-canvas" width="360" height="54"></canvas>
+              </div>
+
+              <div class="master-fader-group">
+                <div class="meter-label-row">
+                  <label for="master-volume-fader">VOLUME GERAL DO MIXER</label>
+                  <span id="master-keepalive-status" style="color: var(--signal-emerald);">● Keep-Alive iOS Ativo</span>
+                </div>
+                <div class="fader-row">
+                  <input
+                    type="range"
+                    id="master-volume-fader"
+                    class="studio-fader"
+                    min="0"
+                    max="150"
+                    value="100"
+                  />
+                  <span class="fader-value-badge" id="master-volume-badge">100%</span>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button type="button" class="btn btn-sm" id="btn-mute-master">
+                  🔊 Master Ativo
+                </button>
+                <button type="button" class="btn btn-sm" id="btn-reset-levels">
+                  Resetar Volumes
+                </button>
+              </div>
+            </div>
+
+            <!-- Canais individuais de cada aparelho conectado -->
+            <div id="mixer-channels-container" class="channels-grid">
+              <!-- Renderizado dinamicamente via app.js -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             MÓDULO 2: TRANSMISSOR DE ÁUDIO (EXECUTADO NO PC WINDOWS / OUTROS)
+             ================================================================ -->
+        <section class="rack-module" id="sender-rack-section">
+          <div class="module-header">
+            <div class="module-title-group">
+              <span class="module-tag">TX // EMISSOR</span>
+              <h2 class="module-title">Transmitir Áudio Deste Aparelho para a Rede</h2>
+            </div>
+            <div class="telemetry-cluster">
+              <span class="telemetry-badge" id="tx-live-badge">
+                <span class="led-indicator" id="tx-live-led"></span>
+                <span id="tx-live-status">Parado</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="module-body">
+            <!-- Seleção da fonte de captura -->
+            <div class="tx-source-cards" role="radiogroup" aria-label="Fonte de áudio para transmitir">
+              <button type="button" class="source-card selected" id="src-card-system" data-source="system">
+                <div class="source-card-top">
+                  <span class="source-card-icon">🖥️</span>
+                  <span class="source-card-badge">RECOMENDADO NO PC</span>
+                </div>
+                <div class="source-card-title">Áudio do Sistema Windows / Aba</div>
+                <div class="source-card-desc">
+                  Captura tudo o que está saindo no Windows (jogos, YouTube, Spotify, reuniões) direto pelo navegador sem instalar drivers.
+                </div>
+              </button>
+
+              <button type="button" class="source-card" id="src-card-mic" data-source="mic">
+                <div class="source-card-top">
+                  <span class="source-card-icon">🎙️</span>
+                  <span class="source-card-badge">ENTRADA / CABO</span>
+                </div>
+                <div class="source-card-title">Microfone / Placa de Som / Aux</div>
+                <div class="source-card-desc">
+                  Captura uma entrada de áudio específica (Microfone, Mixagem Estéreo do Windows ou cabo Line-In).
+                </div>
+              </button>
+
+              <button type="button" class="source-card" id="src-card-synth" data-source="synth">
+                <div class="source-card-top">
+                  <span class="source-card-icon">🎵</span>
+                  <span class="source-card-badge">TESTE IMEDIATO</span>
+                </div>
+                <div class="source-card-title">Gerador Musical de Teste</div>
+                <div class="source-card-desc">
+                  Gera uma trilha estéreo rítmica em tempo real para testar a transmissão para o seu iPhone em 1 clique.
+                </div>
+              </button>
+            </div>
+
+            <!-- Guia prático para capturar o som completo do Windows -->
+            <div class="windows-guide-box" id="windows-capture-guide">
+              <div class="meter-label-row">
+                <span>COMO CAPTURAR TODO O SOM DO SEU PC WINDOWS NO CHROME / EDGE:</span>
+                <span style="color: var(--signal-amber);">Sem instalar nada</span>
+              </div>
+              <div class="guide-steps">
+                <div class="guide-step">
+                  <strong>PASSO 1</strong>
+                  Clique em <b>Iniciar Transmissão</b> abaixo para abrir a janela do navegador.
+                </div>
+                <div class="guide-step">
+                  <strong>PASSO 2</strong>
+                  Escolha a aba <b>"Tela inteira"</b> (para todo o som do PC) ou uma <b>"Aba"</b> específica.
+                </div>
+                <div class="guide-step">
+                  <strong>PASSO 3</strong>
+                  Marque a opção <b>"Compartilhar também o áudio do sistema"</b> no rodapé da janela!
+                </div>
+              </div>
+            </div>
+
+            <!-- Seletor de dispositivo de entrada quando em modo Microfone/Aux -->
+            <div class="windows-guide-box hidden" id="mic-device-selector-box">
+              <label for="select-audio-input" class="ip-selector-label">
+                ESCOLHA O DISPOSITIVO DE ENTRADA DE ÁUDIO (OU "MIXAGEM ESTÉREO" DO WINDOWS):
+              </label>
+              <select id="select-audio-input" class="studio-select" style="width:100%;"></select>
+            </div>
+
+            <!-- Controles do Emissor -->
+            <div class="tx-action-bar">
+              <div class="tx-settings-group">
+                <div>
+                  <label for="input-device-name" class="ip-selector-label" style="display:block; margin-bottom:3px;">
+                    NOME DESTE APARELHO NA MESA:
+                  </label>
+                  <input
+                    type="text"
+                    id="input-device-name"
+                    class="studio-input"
+                    maxlength="40"
+                    placeholder="Ex: PC Windows (Escritório)"
+                  />
+                </div>
+
+                <div>
+                  <label for="select-transport-mode" class="ip-selector-label" style="display:block; margin-bottom:3px;">
+                    MOTOR DE TRANSMISSÃO:
+                  </label>
+                  <select id="select-transport-mode" class="studio-select">
+                    <option value="hybrid" selected>Híbrido (WebRTC + WebSocket PCM para iOS)</option>
+                    <option value="ws-pcm">WebSocket PCM Direto (100% imune a Firewall)</option>
+                    <option value="webrtc">WebRTC P2P Puro (Opus Estéreo)</option>
+                  </select>
+                </div>
+
+                <label class="telemetry-badge" style="cursor:pointer; margin-top: 18px;" title="Silencia os alto-falantes do PC ao capturar uma aba para ouvir só no iPhone">
+                  <input type="checkbox" id="chk-mute-local-tab" style="accent-color: var(--signal-amber);" />
+                  <span>Silenciar aba no PC</span>
+                </label>
+              </div>
+
+              <div style="display:flex; gap:0.65rem; align-items:center;">
+                <button type="button" class="btn btn-amber" id="btn-toggle-broadcast">
+                  📡 Iniciar Transmissão Deste Aparelho
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ==================================================================
+           COLUNA DIREITA: CONECTAR IPHONE / ANDROID VIA QR CODE + REDE LOCAL
+           ================================================================== -->
+      <aside class="studio-right-column">
+        <section class="rack-module">
+          <div class="module-header">
+            <div class="module-title-group">
+              <span class="module-tag rx" id="qr-mode-tag">WI-FI / P2P</span>
+              <h2 class="module-title">Conectar iPhone / Android</h2>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="qr-connect-box">
+              <div class="qr-frame" id="qr-code-container" aria-label="QR Code para abrir no celular">
+                <!-- SVG QR Code gerado offline -->
+              </div>
+
+              <p style="font-size:0.82rem; color:var(--text-secondary);" id="qr-helper-text">
+                Aponte a câmera do seu <strong>iPhone</strong> ou <strong>Android</strong> para abrir o receptor direto no Safari/Chrome.
+              </p>
+
+              <div class="url-copy-bar">
+                <code class="url-code" id="lan-receiver-url">Carregando link...</code>
+                <button type="button" class="btn btn-sm" id="btn-copy-lan-url">Copiar</button>
+              </div>
+
+              <!-- Código de Sala P2P (Funciona em GitHub Pages / Web sem precisar instalar servidor!) -->
+              <div class="ip-selector-row">
+                <label for="input-room-code" class="ip-selector-label">
+                  CÓDIGO DA SALA P2P (CONECTA PC ↔ IPHONE SEM SERVIDOR):
+                </label>
+                <div style="display:flex; gap:0.45rem;">
+                  <input
+                    type="text"
+                    id="input-room-code"
+                    class="studio-input"
+                    style="flex:1; font-family:var(--font-mono); font-weight:700; text-transform:uppercase; letter-spacing:0.08em;"
+                    maxlength="12"
+                    placeholder="EX: FONE01"
+                  />
+                  <button type="button" class="btn btn-sm" id="btn-apply-room">Entrar</button>
+                </div>
+              </div>
+
+              <div class="ip-selector-row" id="ip-interface-selector-wrap">
+                <label for="select-lan-ip" class="ip-selector-label">
+                  ADAPTADOR DE REDE LOCAL (MODO SERVIDOR NODE):
+                </label>
+                <select id="select-lan-ip" class="studio-select"></select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Lista em tempo real de todos os aparelhos conectados na sala -->
+        <section class="rack-module">
+          <div class="module-header">
+            <div class="module-title-group">
+              <span class="module-tag">SALA ATIVA</span>
+              <h2 class="module-title">Aparelhos Conectados (<span id="connected-count">1</span>)</h2>
+            </div>
+          </div>
+          <div class="module-body">
+            <div id="network-nodes-container" class="network-nodes-list">
+              <!-- Renderizado via app.js -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Dica de Uso no iPhone com Fone Bluetooth -->
+        <section class="rack-module">
+          <div class="module-header">
+            <div class="module-title-group">
+              <span class="module-tag rx">DICA IPHONE</span>
+              <h2 class="module-title">Como Usar com AirPods / Bluetooth</h2>
+            </div>
+          </div>
+          <div class="module-body" style="font-size:0.81rem; color:var(--text-secondary); display:flex; flex-direction:column; gap:0.65rem;">
+            <p>
+              <strong>1. Fone conectado só no iPhone:</strong> Mantenha seu fone Bluetooth pareado normalmente no iPhone.
+            </p>
+            <p>
+              <strong>2. No PC Windows:</strong> Abra este app, clique em <em>Iniciar Transmissão</em> e marque <em>Compartilhar áudio do sistema</em>.
+            </p>
+            <p>
+              <strong>3. No iPhone:</strong> Escaneie o QR Code acima (ou digite o mesmo <em>Código da Sala P2P</em>) e toque em <em>Ativar Escuta &amp; 2º Plano</em>. O áudio do PC será misturado com os sons do seu iPhone!
+            </p>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
+  <script src="./qrcode.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

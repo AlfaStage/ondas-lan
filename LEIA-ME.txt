@@ -1,0 +1,27 @@
+=======================================================================
+  ONDAS LAN — HUB & MIXER DE ÁUDIO (PC WINDOWS -> FONE NO IPHONE)
+=======================================================================
+
+COMO USAR DE 2 JEITOS FÁCEIS:
+
+-----------------------------------------------------------------------
+JEITO 1: RODAR DIRETO PELA WEB (SEM INSTALAR NODE.JS NEM NADA NO PC!)
+-----------------------------------------------------------------------
+A pasta "public" funciona 100% sozinha via WebRTC P2P (Código de Sala):
+1. Acesse https://app.netlify.com/drop no navegador do seu PC (ou suba no GitHub Pages).
+2. Arraste a pasta "public" lá para dentro — ele gera um link https://... na hora!
+3. Abra esse link no Chrome/Edge do seu PC Windows, clique em "Iniciar Transmissão"
+   e marque "Compartilhar também o áudio do sistema".
+4. Aponte a câmera do iPhone para o QR Code na tela do PC e toque em
+   "Ativar Escuta & 2º Plano". Pronto!
+
+-----------------------------------------------------------------------
+JEITO 2: RODAR 100% OFFLINE NA SUA REDE WI-FI LOCAL (WINDOWS + NODE.JS)
+-----------------------------------------------------------------------
+1. Tenha o Node.js instalado no Windows (https://nodejs.org/).
+2. Dê dois cliques no arquivo "iniciar-windows.bat".
+   (Se o Firewall do Windows perguntar, marque "Redes Privadas" e clique Permitir).
+3. No navegador do PC que abrir (http://localhost:3000), clique em
+   "Iniciar Transmissão" e marque "Compartilhar também o áudio do sistema".
+4. Com o iPhone no mesmo Wi-Fi (e seu fone Bluetooth conectado só no iPhone),
+   leia o QR Code na tela do PC e toque em "Ativar Escuta & 2º Plano".

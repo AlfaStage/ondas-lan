@@ -1,0 +1,1006 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  /* Paleta Studio Console (Inspirada em hardware de áudio analógico/digital) */
+  --bg-chassis: hsl(220, 13%, 7%);
+  --bg-rack: hsl(220, 11%, 10%);
+  --bg-module: hsl(220, 10%, 13%);
+  --bg-module-raised: hsl(220, 10%, 16%);
+  --bg-well: hsl(220, 14%, 5%);
+
+  --border-hairline: hsl(220, 9%, 19%);
+  --border-bevel: hsl(220, 8%, 24%);
+
+  --text-primary: hsl(40, 18%, 94%);
+  --text-secondary: hsl(220, 9%, 68%);
+  --text-muted: hsl(220, 8%, 48%);
+
+  --signal-emerald: hsl(152, 76%, 46%);
+  --signal-emerald-dim: hsla(152, 76%, 46%, 0.14);
+  --signal-amber: hsl(37, 94%, 55%);
+  --signal-amber-dim: hsla(37, 94%, 55%, 0.15);
+  --signal-coral: hsl(6, 82%, 58%);
+  --signal-coral-dim: hsla(6, 82%, 58%, 0.15);
+  --signal-cyan: hsl(194, 85%, 54%);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-module: 0 8px 24px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-well: inset 0 2px 5px rgba(0, 0, 0, 0.65);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background-color: var(--bg-chassis);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ============================================================================
+   TOP CONSOLE BAR
+   ============================================================================ */
+
+.console-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background-color: hsla(220, 13%, 8%, 0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-hairline);
+  padding: 0.75rem 1.25rem;
+}
+
+.header-inner {
+  max-width: 1380px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brand-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-module-raised);
+  border: 1px solid var(--border-bevel);
+  display: grid;
+  place-items: center;
+  color: var(--signal-amber);
+  box-shadow: var(--shadow-module);
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+
+.brand-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+
+/* Seletor de Modo do Aparelho */
+.mode-switcher {
+  display: inline-flex;
+  background: var(--bg-well);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-well);
+  gap: 4px;
+}
+
+.mode-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+}
+
+.mode-btn:hover {
+  color: var(--text-primary);
+  background: hsla(220, 10%, 20%, 0.5);
+}
+
+.mode-btn.active {
+  background: var(--bg-module-raised);
+  color: var(--text-primary);
+  border-color: var(--border-bevel);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.mode-btn.active .mode-dot {
+  background: var(--signal-emerald);
+  box-shadow: 0 0 8px var(--signal-emerald);
+}
+
+.mode-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+/* Status Telemetry Bar */
+.telemetry-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.telemetry-badge {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-well);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.led-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  display: inline-block;
+}
+
+.led-indicator.online {
+  background: var(--signal-emerald);
+  box-shadow: 0 0 8px var(--signal-emerald);
+}
+
+.led-indicator.streaming {
+  background: var(--signal-amber);
+  box-shadow: 0 0 8px var(--signal-amber);
+}
+
+.led-indicator.error {
+  background: var(--signal-coral);
+}
+
+/* ============================================================================
+   LAYOUT PRINCIPAL
+   ============================================================================ */
+
+.console-main {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Barra de Desbloqueio de Áudio / iOS Background */
+.ios-unlock-banner {
+  background: linear-gradient(180deg, hsl(37, 25%, 14%) 0%, hsl(220, 12%, 11%) 100%);
+  border: 1px solid hsl(37, 50%, 28%);
+  border-radius: var(--radius-md);
+  padding: 0.95rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-module);
+}
+
+.ios-unlock-banner.unlocked {
+  background: var(--bg-rack);
+  border-color: var(--border-hairline);
+}
+
+.banner-info {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.banner-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--signal-amber-dim);
+  color: var(--signal-amber);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 1.2rem;
+}
+
+.ios-unlock-banner.unlocked .banner-icon {
+  background: var(--signal-emerald-dim);
+  color: var(--signal-emerald);
+}
+
+.banner-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.96rem;
+  color: var(--text-primary);
+}
+
+.banner-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+/* Grid Principal do Console */
+.studio-grid {
+  display: grid;
+  grid-template-columns: 1fr 370px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.studio-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.studio-right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ============================================================================
+   PAINÉIS / RACKS DE HARDWARE
+   ============================================================================ */
+
+.rack-module {
+  background: var(--bg-rack);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-module);
+  overflow: hidden;
+}
+
+.module-header {
+  padding: 0.9rem 1.2rem;
+  background: var(--bg-module);
+  border-bottom: 1px solid var(--border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.module-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.module-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: var(--bg-well);
+  color: var(--signal-amber);
+  border: 1px solid var(--border-hairline);
+}
+
+.module-tag.rx {
+  color: var(--signal-emerald);
+}
+
+.module-title {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.module-body {
+  padding: 1.2rem;
+}
+
+/* ============================================================================
+   BOTÕES TÁTEIS DE HARDWARE
+   ============================================================================ */
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--border-bevel);
+  background: var(--bg-module-raised);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+}
+
+.btn:hover {
+  background: hsl(220, 10%, 20%);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-amber {
+  background: var(--signal-amber);
+  color: hsl(220, 15%, 7%);
+  border-color: hsl(37, 94%, 62%);
+  font-weight: 700;
+}
+
+.btn-amber:hover {
+  background: hsl(37, 94%, 60%);
+}
+
+.btn-emerald {
+  background: var(--signal-emerald);
+  color: hsl(220, 15%, 7%);
+  border-color: hsl(152, 76%, 54%);
+  font-weight: 700;
+}
+
+.btn-emerald:hover {
+  background: hsl(152, 76%, 52%);
+}
+
+.btn-coral {
+  background: var(--signal-coral-dim);
+  color: var(--signal-coral);
+  border-color: hsla(6, 82%, 58%, 0.4);
+}
+
+.btn-coral:hover {
+  background: var(--signal-coral);
+  color: #fff;
+}
+
+.btn-sm {
+  font-size: 0.76rem;
+  padding: 0.35rem 0.7rem;
+}
+
+/* ============================================================================
+   MESA MIXER DE RECEPÇÃO (ONDE O IPHONE MISTURA OS APARELHOS)
+   ============================================================================ */
+
+.master-bus-strip {
+  background: var(--bg-well);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.15rem;
+  display: grid;
+  grid-template-columns: 1.2fr 1.5fr auto;
+  gap: 1.15rem;
+  align-items: center;
+  box-shadow: var(--shadow-well);
+}
+
+.master-meter-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.meter-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.spectrum-canvas {
+  width: 100%;
+  height: 54px;
+  background: hsl(220, 15%, 4%);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  display: block;
+}
+
+.master-fader-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.fader-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fader-value-badge {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  min-width: 52px;
+  text-align: right;
+  color: var(--signal-emerald);
+}
+
+/* Estilização de Sliders estilo Fader de Console */
+input[type='range'].studio-fader {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: hsl(220, 14%, 6%);
+  border: 1px solid var(--border-hairline);
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type='range'].studio-fader::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: hsl(220, 10%, 88%);
+  border: 2px solid hsl(220, 12%, 12%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  cursor: grab;
+  transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+input[type='range'].studio-fader::-webkit-slider-thumb:hover {
+  background: #ffffff;
+  transform: scale(1.06);
+}
+
+input[type='range'].studio-fader.amber-fader::-webkit-slider-thumb {
+  background: var(--signal-amber);
+}
+
+/* Lista de Canais (Aparelhos Conectados) */
+.channels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+  gap: 1rem;
+}
+
+.channel-strip {
+  background: var(--bg-module);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  position: relative;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.channel-strip.is-active-stream {
+  border-color: hsla(152, 76%, 46%, 0.45);
+}
+
+.channel-strip.is-ducked {
+  opacity: 0.78;
+}
+
+.channel-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.channel-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.device-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-well);
+  border: 1px solid var(--border-hairline);
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+}
+
+.channel-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.94rem;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.channel-source-meta {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.transport-pill {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  padding: 0.18rem 0.48rem;
+  border-radius: 4px;
+  background: var(--bg-well);
+  border: 1px solid var(--border-hairline);
+  color: var(--signal-emerald);
+}
+
+/* Medidor VU LED Horizontal de 18 Segmentos */
+.vu-meter-bar {
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  gap: 3px;
+  background: var(--bg-well);
+  padding: 5px 6px;
+  border-radius: 5px;
+  border: 1px solid var(--border-hairline);
+}
+
+.vu-seg {
+  height: 10px;
+  border-radius: 2px;
+  background: hsl(220, 10%, 15%);
+  transition: background-color 0.04s linear;
+}
+
+.vu-seg.on-green {
+  background: var(--signal-emerald);
+}
+
+.vu-seg.on-amber {
+  background: var(--signal-amber);
+}
+
+.vu-seg.on-red {
+  background: var(--signal-coral);
+}
+
+/* Controles do Canal */
+.channel-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.control-line {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.control-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.71rem;
+  color: var(--text-secondary);
+}
+
+.channel-buttons-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+  margin-top: 0.2rem;
+}
+
+.ch-btn {
+  appearance: none;
+  background: var(--bg-well);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.71rem;
+  font-weight: 700;
+  padding: 0.42rem 0.3rem;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.12s ease;
+}
+
+.ch-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-bevel);
+}
+
+.ch-btn.mute-active {
+  background: var(--signal-coral);
+  color: #fff;
+  border-color: var(--signal-coral);
+}
+
+.ch-btn.solo-active {
+  background: var(--signal-amber);
+  color: hsl(220, 15%, 7%);
+  border-color: var(--signal-amber);
+}
+
+.ch-btn.priority-active {
+  background: var(--signal-emerald-dim);
+  color: var(--signal-emerald);
+  border-color: var(--signal-emerald);
+}
+
+/* Equalizador Rápido do Canal */
+.eq-mini-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--border-hairline);
+}
+
+/* Estado Vazio */
+.empty-mixer-state {
+  background: var(--bg-well);
+  border: 1px dashed var(--border-bevel);
+  border-radius: var(--radius-md);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.empty-mixer-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.empty-mixer-sub {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  max-width: 520px;
+}
+
+/* ============================================================================
+   DECK TRANSMISSOR (CAPTURA DE ÁUDIO DO PC WINDOWS / ABA / MICROFONE)
+   ============================================================================ */
+
+.tx-source-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.1rem;
+}
+
+.source-card {
+  background: var(--bg-module);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.source-card:hover {
+  border-color: var(--border-bevel);
+  background: var(--bg-module-raised);
+}
+
+.source-card.selected {
+  border-color: var(--signal-amber);
+  background: linear-gradient(180deg, hsla(37, 94%, 55%, 0.1) 0%, var(--bg-module) 100%);
+}
+
+.source-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.source-card-icon {
+  font-size: 1.25rem;
+}
+
+.source-card-badge {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: var(--bg-well);
+  color: var(--text-secondary);
+}
+
+.source-card.selected .source-card-badge {
+  color: var(--signal-amber);
+}
+
+.source-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+
+.source-card-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Guia Passo-a-Passo Windows */
+.windows-guide-box {
+  background: var(--bg-well);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.guide-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.65rem;
+}
+
+.guide-step {
+  background: var(--bg-module);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem;
+  font-size: 0.79rem;
+  color: var(--text-secondary);
+}
+
+.guide-step strong {
+  color: var(--text-primary);
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--signal-amber);
+  margin-bottom: 0.15rem;
+}
+
+/* Barra de Controle de Transmissão */
+.tx-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.tx-settings-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.studio-input,
+.studio-select {
+  background: var(--bg-well);
+  border: 1px solid var(--border-bevel);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+
+.studio-input:focus,
+.studio-select:focus {
+  border-color: var(--signal-amber);
+}
+
+/* ============================================================================
+   COLUNA DIREITA: QR CODE DE CONEXÃO RÁPIDA + DIAGNÓSTICO DE REDE
+   ============================================================================ */
+
+.qr-connect-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.9rem;
+}
+
+.qr-frame {
+  width: 188px;
+  height: 188px;
+  padding: 10px;
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+}
+
+.url-copy-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--bg-well);
+  border: 1px solid var(--border-hairline);
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-sm);
+}
+
+.url-code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--signal-emerald);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  text-align: left;
+}
+
+.ip-selector-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  text-align: left;
+}
+
+.ip-selector-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+/* Lista de Aparelhos na Rede */
+.network-nodes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.node-item {
+  background: var(--bg-module);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.node-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.node-name {
+  font-weight: 600;
+  font-size: 0.84rem;
+}
+
+.node-role {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   RESPONSIVIDADE (IPHONE / ANDROID / TELAS MENORES)
+   ============================================================================ */
+
+@media (max-width: 1040px) {
+  .studio-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .console-header {
+    padding: 0.65rem 0.85rem;
+  }
+
+  .console-main {
+    padding: 0.85rem;
+  }
+
+  .master-bus-strip {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .mode-switcher {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .mode-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 0.45rem 0.4rem;
+    font-size: 0.76rem;
+  }
+}
+
+.hidden {
+  display: none !important;
+}

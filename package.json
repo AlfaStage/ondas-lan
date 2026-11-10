@@ -1,0 +1,13 @@
+{
+  "name": "ondas-lan-audio-hub",
+  "version": "1.0.0",
+  "description": "Hub de áudio via rede local (Wi-Fi) para transmitir o som do PC e outros aparelhos direto para o fone no iPhone/Android via navegador.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

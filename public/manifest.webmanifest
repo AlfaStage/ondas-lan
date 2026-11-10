@@ -1,0 +1,9 @@
+{
+  "name": "Ondas LAN — Hub de Áudio no Fone",
+  "short_name": "Ondas LAN",
+  "description": "Ouça o áudio do seu PC Windows e de outros aparelhos direto no fone conectado ao iPhone ou Android.",
+  "start_url": "./?role=receiver",
+  "display": "standalone",
+  "background_color": "#101216",
+  "theme_color": "#101216"
+}
